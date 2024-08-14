@@ -1,38 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Migrate CSV to Database</title>
+    <title>DataMate</title>
+    <link rel="icon" type="image/x-png" href="../static/logo.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
-    <h1>Migrate CSV to Database</h1>
-    <form action="/migrate" method="post" enctype="multipart/form-data">
-        <label for="db_type">Database Type:</label>
-        <select id="db_type" name="db_type" required>
-            <option value="mysql">MySQL</option>
-            <option value="postgres">PostgreSQL</option>
-        </select><br><br>
+    <video class="background-video" autoplay muted loop>
+        <source src="{{ url_for('static', filename='bg.mp4') }}" type="video/mp4">
+    </video>
+    <div class="main">
+        <div class="migrate-content-box">
+            <h1>Migrate CSV to Database</h1>
+            <form action="/migrate" method="post" enctype="multipart/form-data">
+                <label for="db_type">Choose Database:</label>
+                <select id="db_type" name="db_type" required>
+                    <option value="mysql">MySQL</option>
+                    <option value="postgres">PostgreSQL</option>
+                </select><br><br>
 
-        <label for="host">Host:</label>
-        <input type="text" id="host" name="host" required><br><br>
+                <!-- <label for="host">Host:</label> -->
+                <input type="text" id="host" name="host" required, placeholder="Host"><br><br>
 
-        <label for="user">User:</label>
-        <input type="text" id="user" name="user" required><br><br>
+                <!-- <label for="user">User:</label> -->
+                <input type="text" id="user" name="user" required, placeholder="User Name"><br><br>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
+                <!-- <label for="password">Password:</label> -->
+                <input type="password" id="password" name="password" required, placeholder="Password"><br><br>
 
-        <label for="database">Database:</label>
-        <input type="text" id="database" name="database" required><br><br>
+                <!-- <label for="database">Database:</label> -->
+                <input type="text" id="database" name="database" required, placeholder="Database"><br><br>
 
-        <label for="table_name">Table Name:</label>
-        <input type="text" id="table_name" name="table_name" required><br><br>
+                <!-- <label for="table_name">Table Name:</label> -->
+                <input type="text" id="table_name" name="table_name" required, placeholder="Table Name"><br><br>
 
-        <label for="csv_file">CSV File:</label>
-        <input type="file" id="csv_file" name="csv_file" required><br><br>
+                <label for="csv_file">CSV File:</label>
+                <input type="file" id="csv_file" name="csv_file" required><br><br>
 
-        <button type="submit">Migrate CSV to DB</button>
-    </form>
+                <button type="submit">Migrate CSV to DB</button>
+            </form>
+        </div>
+    </div>
+
 </body>
+
 </html>

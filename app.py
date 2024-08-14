@@ -52,10 +52,10 @@ class ExportToCSVAPI(MethodView):
                         csv_filename = os.path.join(output_directory, f'{table}.csv')
                         df.to_csv(csv_filename, index=False)
             
-            return jsonify({"message": "Tables exported successfully", "status": "success"}), 200
+            return render_template('success.html')
 
         except Exception as e:
-            return jsonify({"message": str(e), "status": "error"}), 500
+            return render_template('error.html', error_message=str(e))
 
 class MigrateCSVToDBAPI(MethodView):
     def get(self):
@@ -119,10 +119,10 @@ class MigrateCSVToDBAPI(MethodView):
                 
                 connection.commit()
 
-            return jsonify({"message": "CSV data migrated successfully", "status": "success"}), 200
+            return render_template('success.html')
 
         except Exception as e:
-            return jsonify({"message": str(e), "status": "error"}), 500
+            return render_template('error.html', error_message=str(e))
 
     def _get_column_type(self, series, db_type):
         """
