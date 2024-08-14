@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataMate</title>
+    <link rel="icon" type="image/x-png" href="../static/logo.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <video class="background-video" autoplay muted loop>
+        <source src="{{ url_for('static', filename='bg.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="main">
+        <div class="export-content-box">
+            <h1>Export Successful</h1>
+            <p>The tables have been exported successfully.</p>
+            <a href="/"><button>Home</button></a>
+        </div>
+    </div>
+</body>
+</html>

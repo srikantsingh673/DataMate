@@ -1,12 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>DataMate</title>
+    <link rel="icon" type="image/x-png" href="../static/logo.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
-    <a href="/migrate"><button>Migrate CSV to Database</button></a>
-    <a href="/export"><button>Migrate Database to CSV</button></a><br><br>
+    <video class="background-video" autoplay muted loop>
+        <source src="{{ url_for('static', filename='bg.mp4') }}" type="video/mp4">
+    </video>
+    <div class="main">
+        <div class="content-box">
+            <a href="/export"><button>Migrate Database to CSV</button></a>
+            <a href="/migrate"><button>Migrate CSV to Database</button></a>
+        </div>
+    </div>
+
+    <footer>
+        <a href="https://in.linkedin.com/in/srikant--singh" target="_blank" rel="noopener noreferrer">
+            <img src="{{ url_for('static', filename='linkedin.png') }}" alt="Logo" class="footer-image">
+        </a>
+        <a href="https://github.com/srikantsingh673" target="_blank" rel="noopener noreferrer">
+            <img src="{{ url_for('static', filename='github.png') }}" alt="Logo" class="footer-image">
+        </a>
+        <a href="mailto:srikantsingh673@gmail.com" target="_blank" rel="noopener noreferrer">
+            <img src="{{ url_for('static', filename='gmail.png') }}" alt="Logo" class="footer-image">
+        </a>
+        <p>Design and Created by Srikant Singh</p>
+    </footer>
+
 </body>
+
 </html>

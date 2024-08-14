@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataMate</title>
+    <link rel="icon" type="image/x-png" href="../static/logo.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <video class="background-video" autoplay muted loop>
+        <source src="{{ url_for('static', filename='bg.mp4') }}" type="video/mp4">
+    </video>
+    <div class="main">
+        <div class="export-content-box">
+            <h1> Error!</h1>
+            <p>{{ error_message }}</p>
+            <a href="/"><button>Home</button></a>
+        </div>
+    </div>
+</body>
+</html>

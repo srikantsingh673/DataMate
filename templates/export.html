@@ -1,29 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Export MySQL Data to CSV</title>
+    <title>DataMate</title>
+    <link rel="icon" type="image/x-png" href="../static/logo.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
-    <h1>Export MySQL Data to CSV</h1>
-    <form action="/export" method="post">
-        <label for="host">Host:</label>
-        <input type="text" id="host" name="host" required><br><br>
+    <video class="background-video" autoplay muted loop>
+        <source src="{{ url_for('static', filename='bg.mp4') }}" type="video/mp4">
+    </video>
+    <div class="main">
+        <div class="export-content-box">
+            <h1>Export Data to CSV</h1>
+            <form action="/export" method="post">
+                <label for="db_type">Choose Database:</label>
+                <select id="db_type" name="db_type" required>
+                    <option value="mysql">MySQL</option>
+                    <option value="postgres">PostgreSQL</option>
+                </select><br><br>
 
-        <label for="user">User:</label>
-        <input type="text" id="user" name="user" required><br><br>
+                <!-- <label for="host">Host:</label> -->
+                <input type="text" id="host" name="host" required placeholder="Host"><br><br>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
+                <!-- <label for="user">User:</label> -->
+                <input type="text" id="user" name="user" required placeholder="User name"><br><br>
 
-        <label for="database">Database:</label>
-        <input type="text" id="database" name="database" required><br><br>
+                <!-- <label for="password">Password:</label> -->
+                <input type="password" id="password" name="password" required placeholder="Password"><br><br>
 
-        <label for="tables">Tables (comma-separated):</label>
-        <input type="text" id="tables" name="tables" required><br><br>
+                <!-- <label for="database">Database:</label> -->
+                <input type="text" id="database" name="database" required, placeholder="Database"><br><br>
 
-        <button type="submit">Export to CSV</button>
-    </form>
+                <!-- <label for="tables">Tables (comma-separated):</label> -->
+                <input type="text" id="tables" name="tables" required
+                    placeholder="Tables name (comma-separated)"><br><br>
+
+                <button type="submit">Export to CSV</button>
+            </form>
+        </div>
+    </div>
+
 </body>
+
 </html>

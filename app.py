@@ -1,21 +1,33 @@
 from flask import Flask, render_template, request, jsonify
 from flask.views import MethodView
-import pymysql
 import pandas as pd
+import pymysql
+import psycopg2
 import os
+
 
 app = Flask(__name__)
 
-def get_db_connection():
+def get_db_connection(db_type):
     """
-    Establish a database connection.
+    Establish a database connection based on the selected database type.
     """
-    return pymysql.connect(
-        host=request.form.get('host'),
-        user=request.form.get('user'),
-        password=request.form.get('password'),
-        database=request.form.get('database')
-    )
+    if db_type == 'mysql':
+        return pymysql.connect(
+            host=request.form.get('host'),
+            user=request.form.get('user'),
+            password=request.form.get('password'),
+            database=request.form.get('database')
+        )
+    elif db_type == 'postgres':
+        return psycopg2.connect(
+            host=request.form.get('host'),
+            user=request.form.get('user'),
+            password=request.form.get('password'),
+            dbname=request.form.get('database')
+        )
+    else:
+        raise ValueError("Unsupported database type")
 
 class DashboardAPI(MethodView):
     def get(self):
@@ -27,11 +39,12 @@ class ExportToCSVAPI(MethodView):
 
     def post(self):
         try:
+            db_type = request.form.get('db_type')  # Get the database type from the form
             tables = [table.strip() for table in request.form.get('tables').split(',')]
             output_directory = './exported_files'
             os.makedirs(output_directory, exist_ok=True)
             
-            with get_db_connection() as connection:
+            with get_db_connection(db_type) as connection:
                 for table in tables:
                     query = f"SELECT * FROM {table}"
                     df = pd.read_sql(query, connection)
@@ -39,10 +52,10 @@ class ExportToCSVAPI(MethodView):
                         csv_filename = os.path.join(output_directory, f'{table}.csv')
                         df.to_csv(csv_filename, index=False)
             
-            return jsonify({"message": "Tables exported successfully", "status": "success"}), 200
+            return render_template('success.html')
 
         except Exception as e:
-            return jsonify({"message": str(e), "status": "error"}), 500
+            return render_template('error.html', error_message=str(e))
 
 class MigrateCSVToDBAPI(MethodView):
     def get(self):
@@ -50,6 +63,7 @@ class MigrateCSVToDBAPI(MethodView):
 
     def post(self):
         try:
+            db_type = request.form.get('db_type') 
             table_name = request.form.get('table_name')
             csv_file = request.files['csv_file']
             df = pd.read_csv(csv_file)
@@ -62,42 +76,68 @@ class MigrateCSVToDBAPI(MethodView):
                 for column in df.columns
             }, inplace=True)
 
-            with get_db_connection() as connection:
+            with get_db_connection(db_type) as connection:
                 cursor = connection.cursor()
-                cursor.execute(f"SHOW TABLES LIKE '{table_name}'")
-                if not cursor.fetchone():
-                    # Create table if it doesn't exist
-                    column_definitions = [
-                        f"`{col}` {self._get_column_type(df[col])}"
-                        for col in df.columns
-                    ]
-                    create_table_query = f"CREATE TABLE `{table_name}` ({', '.join(column_definitions)})"
-                    cursor.execute(create_table_query)
 
-                # Insert data into the table
-                columns = ', '.join([f"`{col}`" for col in df.columns])
-                placeholders = ', '.join(['%s'] * len(df.columns))
-                insert_query = f"INSERT INTO `{table_name}` ({columns}) VALUES ({placeholders})"
-                data_to_insert = [tuple(x) for x in df.to_numpy()]
-                cursor.executemany(insert_query, data_to_insert)
+                # Check if the table exists
+                if db_type == 'mysql':
+                    cursor.execute(f"SHOW TABLES LIKE '{table_name}'")
+                    if not cursor.fetchone():
+                        # Create table if it doesn't exist
+                        column_definitions = [
+                            f'`{col}` {self._get_column_type(df[col], db_type)}'
+                            for col in df.columns
+                        ]
+                        create_table_query = f'CREATE TABLE `{table_name}` ({", ".join(column_definitions)})'
+                        cursor.execute(create_table_query)
+
+                    # Insert data into the table
+                    columns = ', '.join([f'`{col}`' for col in df.columns])
+                    placeholders = ', '.join(['%s'] * len(df.columns))
+                    insert_query = f'INSERT INTO `{table_name}` ({columns}) VALUES ({placeholders})'
+                    data_to_insert = [tuple(x) for x in df.to_numpy()]
+                    cursor.executemany(insert_query, data_to_insert)
+                
+                elif db_type == 'postgres':
+                    # Ensure the table does not exist before creating it
+                    cursor.execute(f"SELECT to_regclass('{table_name}')")
+                    if cursor.fetchone()[0] is None:
+                        # Create table if it doesn't exist
+                        column_definitions = [
+                            f'"{col}" {self._get_column_type(df[col], db_type)}'
+                            for col in df.columns
+                        ]
+                        create_table_query = f'CREATE TABLE "{table_name}" ({", ".join(column_definitions)})'
+                        cursor.execute(create_table_query)
+
+                    # Insert data into the table
+                    columns = ', '.join([f'"{col}"' for col in df.columns])
+                    placeholders = ', '.join(['%s'] * len(df.columns))
+                    insert_query = f'INSERT INTO "{table_name}" ({columns}) VALUES ({placeholders})'
+                    data_to_insert = [tuple(x) for x in df.to_numpy()]
+                    cursor.executemany(insert_query, data_to_insert)
+                
                 connection.commit()
 
-            return jsonify({"message": "CSV data migrated successfully", "status": "success"}), 200
+            return render_template('success.html')
 
         except Exception as e:
-            return jsonify({"message": str(e), "status": "error"}), 500
+            return render_template('error.html', error_message=str(e))
 
-    def _get_column_type(self, series):
+    def _get_column_type(self, series, db_type):
         """
         Determine SQL data type based on pandas Series dtype.
         """
-        
         if pd.api.types.is_numeric_dtype(series):
-            return 'DOUBLE'
+            return 'DOUBLE' if db_type == 'mysql' else 'DOUBLE PRECISION'
         elif pd.api.types.is_datetime64_any_dtype(series):
-            return 'DATETIME'
+            return 'DATETIME' if db_type == 'mysql' else 'TIMESTAMP'
+        elif pd.api.types.is_bool_dtype(series):
+            return 'BOOLEAN'
         else:
             return 'VARCHAR(255)'
+
+
 
 # Register the views
 app.add_url_rule('/', view_func=DashboardAPI.as_view('dashboard'))
