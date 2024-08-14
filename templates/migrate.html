@@ -8,6 +8,12 @@
 <body>
     <h1>Migrate CSV to Database</h1>
     <form action="/migrate" method="post" enctype="multipart/form-data">
+        <label for="db_type">Database Type:</label>
+        <select id="db_type" name="db_type" required>
+            <option value="mysql">MySQL</option>
+            <option value="postgres">PostgreSQL</option>
+        </select><br><br>
+
         <label for="host">Host:</label>
         <input type="text" id="host" name="host" required><br><br>
 

@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Export MySQL Data to CSV</title>
+    <title>Export Data to CSV</title>
 </head>
 <body>
-    <h1>Export MySQL Data to CSV</h1>
+    <h1>Export Data to CSV</h1>
     <form action="/export" method="post">
+        <label for="db_type">Database Type:</label>
+        <select id="db_type" name="db_type" required>
+            <option value="mysql">MySQL</option>
+            <option value="postgres">PostgreSQL</option>
+        </select><br><br>
+
         <label for="host">Host:</label>
         <input type="text" id="host" name="host" required><br><br>
 
